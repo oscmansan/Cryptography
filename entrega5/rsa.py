@@ -1,5 +1,5 @@
 #!/usr/bin/python
-from OpenSSL import crypto
+from Crypto.PublicKey import RSA
 from sympy.ntheory import factorint
 
 # return (g, x, y) a*x + b*y = gcd(x, y)
@@ -20,20 +20,23 @@ f = open('oscar.manas_pubkeyRSA_pseudo.pem','r')
 buff = f.read()
 f.close()
 
-pkey = crypto.load_publickey(crypto.FILETYPE_PEM,buff)
-RSAPublicKey = pkey.to_cryptography_key()
-RSAPublicNumbers = RSAPublicKey.public_numbers()
-n = RSAPublicNumbers.n
-e = RSAPublicNumbers.e
-
+pkey = RSA.importKey(buff)
+n = pkey.n
+e = pkey.e
 print n
 print e
 
 #print factorint(n)
-
 p = 13819589958191161511
 q = 235063665088597395103381104073463970497
 phi = (p-1)*(q-1)
 
 d = mulinv(e,phi)
 print d
+
+privkey = RSA.construct((n,e,d,p,q))
+f = open('oscar.manas_privkeyRSA_pseudo.pem','w')
+f.write(privkey.exportKey())
+f.close()
+
+# openssl rsautl -decrypt -in oscar.manas_RSA_pseudo.enc -out plaintext -inkey oscar.manas_privkeyRSA_pseudo.pem
