@@ -38,4 +38,4 @@ f = open('oscar.manas_privkeyRSA_pseudo.pem','w')
 f.write(privkey.exportKey())
 f.close()
 
-# openssl rsautl -decrypt -in oscar.manas_RSA_pseudo.enc -out plaintext -inkey oscar.manas_privkeyRSA_pseudo.pem
+# openssl rsautl -decrypt -in oscar.manas_RSA_pseudo.enc -out plaintext_pseudo -inkey oscar.manas_privkeyRSA_pseudo.pem
