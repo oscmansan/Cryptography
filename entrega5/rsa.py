@@ -1,6 +1,5 @@
 #!/usr/bin/python
 from Crypto.PublicKey import RSA
-from sympy.ntheory import factorint
 
 # return (g, x, y) a*x + b*y = gcd(x, y)
 def egcd(a, b):
@@ -23,18 +22,18 @@ f.close()
 pkey = RSA.importKey(buff)
 n = pkey.n
 e = pkey.e
-print n
-print e
+print 'n:', n
+print 'e:', e
 
-#print factorint(n)
+# sage: factor(n) -> p, q
 p = 13819589958191161511
 q = 235063665088597395103381104073463970497
 phi = (n*(p-1)*(q-1))/(p*q)
 
 d = mulinv(e,phi)
-print d
+print 'd:', d
 
-privkey = RSA.construct((n,e,d,p,q))
+privkey = RSA.construct((n,e,d))
 f = open('oscar.manas_privkeyRSA_pseudo.pem','w')
 f.write(privkey.exportKey())
 f.close()
