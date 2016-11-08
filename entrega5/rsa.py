@@ -29,7 +29,7 @@ print e
 #print factorint(n)
 p = 13819589958191161511
 q = 235063665088597395103381104073463970497
-phi = (p-1)*(q-1)
+phi = (n*(p-1)*(q-1))/(p*q)
 
 d = mulinv(e,phi)
 print d
