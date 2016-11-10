@@ -25,7 +25,7 @@ e = pkey.e
 print 'n:', n
 print 'e:', e
 
-# sage: factor(n) -> p, q
+# sage: factor(n) -> 13819589958191161511^16 * 235063665088597395103381104073463970497^8
 p = 13819589958191161511
 q = 235063665088597395103381104073463970497
 phi = (n*(p-1)*(q-1))/(p*q)
@@ -38,4 +38,4 @@ f = open('oscar.manas_privkeyRSA_pseudo.pem','w')
 f.write(privkey.exportKey())
 f.close()
 
-# openssl rsautl -decrypt -in oscar.manas_RSA_pseudo.enc -out plaintext_pseudo -inkey oscar.manas_privkeyRSA_pseudo.pem
+# openssl rsautl -decrypt -in oscar.manas_RSA_pseudo.enc -out oscar.manas_RSA_pseudo.dec -inkey oscar.manas_privkeyRSA_pseudo.pem

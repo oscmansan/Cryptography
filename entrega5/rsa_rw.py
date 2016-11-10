@@ -39,7 +39,7 @@ for file in os.listdir(folder):
 		break
 
 q = n / p
-phi = (n*(p-1)*(q-1))/(p*q)
+phi = (p-1)*(q-1)
 
 d = mulinv(e,phi)
 print 'd:', d
@@ -49,4 +49,4 @@ f = open('oscar.manas_privkeyRSA_RW.pem','w')
 f.write(privkey.exportKey())
 f.close()
 
-# openssl rsautl -decrypt -in oscar.manas_RSA_RW.enc -out plaintext_rw -inkey oscar.manas_privkeyRSA_RW.pem
+# openssl rsautl -decrypt -in oscar.manas_RSA_RW.enc -out oscar.manas_RSA_RW.dec -inkey oscar.manas_privkeyRSA_RW.pem
