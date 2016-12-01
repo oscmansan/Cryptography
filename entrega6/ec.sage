@@ -28,16 +28,17 @@ print 'Order of point P:', P.order()
 signature = '3046022100b3363e0acb7ef124de271e5d14c0270a0694d277815993e65997156eeb058d64022100f5261d8d5b02ea67af0ef5b7bd184c992a0a36738da3846a17188704cedbf323'
 f1 = int(signature[8:8+66],16)
 f2 = int(signature[-66:],16)
-print len(signature)
-print 'f1', signature[8:8+66]
-print 'f2', signature[-66:]
-hash_m = 0x1b71729becf5696ecf188ae0a6d83e559d2929a2
+print 'f1:', signature[8:8+66]
+print 'f2:', signature[-66:]
+sha_hash = 0x527baf231fec3b2c72fbfa663116ec6fc6366fcad958b884db63919a9344a19f
 G = E(Gx,Gy)
 q = G.order()
 
 w = inverse_mod(f2,q)
-w1 = (hash_m * w) % q;
+w1 = (sha_hash * w) % q;
 w2 = (f1 * w) % q;
 v = w1*G+w2*P
 x = int(v[0])
 print 'Correct certificate?', (x % q) == f1
+
+#f8ce0926c6631c729b9f37d5f9725f2c60dca677993f815fb810244bd9371681527baf231fec3b2c72fbfa663116ec6fc6366fcad958b884db63919a9344a19f
