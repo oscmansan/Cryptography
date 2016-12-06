@@ -1,4 +1,6 @@
 #!/usr/bin/env sage
+import urllib2
+import OpenSSL
 
 ## Exercise 1 #################################################################
 print '## Exercise 1 ###################################'
@@ -31,8 +33,8 @@ print 'Order of point P:', P.order()
 signature = '3046022100b3363e0acb7ef124de271e5d14c0270a0694d277815993e65997156eeb058d64022100f5261d8d5b02ea67af0ef5b7bd184c992a0a36738da3846a17188704cedbf323'
 f1 = Integer(signature[8:8+66],16)
 f2 = Integer(signature[-66:],16)
-print 'f1:', signature[8:8+66]
-print 'f2:', signature[-66:]
+#print 'f1:', signature[8:8+66]
+#print 'f2:', signature[-66:]
 #f8ce0926c6631c729b9f37d5f9725f2c60dca677993f815fb810244bd9371681527baf231fec3b2c72fbfa663116ec6fc6366fcad958b884db63919a9344a19f
 h = 0xf8ce0926c6631c729b9f37d5f9725f2c60dca677993f815fb810244bd9371681
 G = E(Gx,Gy)
@@ -49,7 +51,7 @@ print 'Correct signature?', mod(v[0],q) == f1
 ## Exercise 2 #################################################################
 print '\n## Exercise 2 ###################################'
 
-# Web site: twitter.com
+# Website: twitter.com
 
 # Curve P-256 (from http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.186-4.pdf)
 print 'Curve P-256'
@@ -76,12 +78,26 @@ print 'pubkey:', pubkey
 x = dni
 z = mod(x**3+a*x+b,p)
 assert(mod(z**((p-1)/2),p)==1)
-y = z**((p+1)/4)
+y = mod(z**((p+1)/4),p)
 Q = E(x,y)
 assert(mod(y**2,p)==mod(x**3+a*x+b,p))
 print 'Q:', Q
 
 # We can't find the private key associated to the public key Q because 
 # it's the Discrete Logarithm Problem, which is conjetured intractable
-# print discrete_log(Q,G,G.order(),operation='+') # takes forever
+# print discrete_log(Q, G, G.order(), operation='+') # takes forever
 
+
+## Exercise 3 #################################################################
+print '\n## Exercise 3 ###################################'
+
+CRL_URI = 'http://sr.symcb.com/sr.crl'
+crl_file = urllib2.urlopen(CRL_URI)
+crl_object = OpenSSL.crypto.load_crl(OpenSSL.crypto.FILETYPE_ASN1, crl_file.read())
+crl_file.close()
+revoked_objects = crl_object.get_revoked()
+print 'CRL revoked certificates:', len(revoked_objects)
+
+# https://raymii.org/s/articles/OpenSSL_Manually_Verify_a_certificate_against_an_OCSP.html
+# https://blog.ivanristic.com/2014/02/checking-ocsp-revocation-using-openssl.html
+# openssl ocsp -issuer issuer.crt -cert twitter.com.crt -text -url http://sr.symcd.com

@@ -3,6 +3,8 @@
 from sage.all_cmdline import *   # import sage library
 
 _sage_const_3 = Integer(3); _sage_const_2 = Integer(2); _sage_const_1 = Integer(1); _sage_const_8 = Integer(8); _sage_const_115792089210356248762697446949407573530086143415290314195533631308867097853951 = Integer(115792089210356248762697446949407573530086143415290314195533631308867097853951); _sage_const_4 = Integer(4); _sage_const_66 = Integer(66); _sage_const_0xf8ce0926c6631c729b9f37d5f9725f2c60dca677993f815fb810244bd9371681 = Integer(0xf8ce0926c6631c729b9f37d5f9725f2c60dca677993f815fb810244bd9371681); _sage_const_0x6b17d1f2e12c4247f8bce6e563a440f277037d812deb33a0f4a13945d898c296 = Integer(0x6b17d1f2e12c4247f8bce6e563a440f277037d812deb33a0f4a13945d898c296); _sage_const_77620769 = Integer(77620769); _sage_const_0x4fe342e2fe1a7f9b8ee7eb4a7c0f9e162bce33576b315ececbb6406837bf51f5 = Integer(0x4fe342e2fe1a7f9b8ee7eb4a7c0f9e162bce33576b315ececbb6406837bf51f5); _sage_const_0 = Integer(0); _sage_const_16 = Integer(16); _sage_const_0x5ac635d8aa3a93e7b3ebbd55769886bc651d06b0cc53b0f63bce3c3e27d2604b = Integer(0x5ac635d8aa3a93e7b3ebbd55769886bc651d06b0cc53b0f63bce3c3e27d2604b)#!/usr/bin/env sage
+import urllib2
+import OpenSSL
 
 ## Exercise 1 #################################################################
 print '## Exercise 1 ###################################'
@@ -35,8 +37,8 @@ print 'Order of point P:', P.order()
 signature = '3046022100b3363e0acb7ef124de271e5d14c0270a0694d277815993e65997156eeb058d64022100f5261d8d5b02ea67af0ef5b7bd184c992a0a36738da3846a17188704cedbf323'
 f1 = Integer(signature[_sage_const_8 :_sage_const_8 +_sage_const_66 ],_sage_const_16 )
 f2 = Integer(signature[-_sage_const_66 :],_sage_const_16 )
-print 'f1:', signature[_sage_const_8 :_sage_const_8 +_sage_const_66 ]
-print 'f2:', signature[-_sage_const_66 :]
+#print 'f1:', signature[8:8+66]
+#print 'f2:', signature[-66:]
 #f8ce0926c6631c729b9f37d5f9725f2c60dca677993f815fb810244bd9371681527baf231fec3b2c72fbfa663116ec6fc6366fcad958b884db63919a9344a19f
 h = _sage_const_0xf8ce0926c6631c729b9f37d5f9725f2c60dca677993f815fb810244bd9371681 
 G = E(Gx,Gy)
@@ -52,6 +54,8 @@ print 'Correct signature?', mod(v[_sage_const_0 ],q) == f1
 
 ## Exercise 2 #################################################################
 print '\n## Exercise 2 ###################################'
+
+# Website: twitter.com
 
 # Curve P-256 (from http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.186-4.pdf)
 print 'Curve P-256'
@@ -78,13 +82,27 @@ print 'pubkey:', pubkey
 x = dni
 z = mod(x**_sage_const_3 +a*x+b,p)
 assert(mod(z**((p-_sage_const_1 )/_sage_const_2 ),p)==_sage_const_1 )
-y = z**((p+_sage_const_1 )/_sage_const_4 )
+y = mod(z**((p+_sage_const_1 )/_sage_const_4 ),p)
 Q = E(x,y)
 assert(mod(y**_sage_const_2 ,p)==mod(x**_sage_const_3 +a*x+b,p))
 print 'Q:', Q
 
 # We can't find the private key associated to the public key Q because 
 # it's the Discrete Logarithm Problem, which is conjetured intractable
-# print discrete_log(Q,G,G.order(),operation='+') # takes forever
+# print discrete_log(Q, G, G.order(), operation='+') # takes forever
 
+
+## Exercise 3 #################################################################
+print '\n## Exercise 3 ###################################'
+
+CRL_URI = 'http://sr.symcb.com/sr.crl'
+crl_file = urllib2.urlopen(CRL_URI)
+crl_object = OpenSSL.crypto.load_crl(OpenSSL.crypto.FILETYPE_ASN1, crl_file.read())
+crl_file.close()
+revoked_objects = crl_object.get_revoked()
+print 'CRL revoked certificates:', len(revoked_objects)
+
+# https://raymii.org/s/articles/OpenSSL_Manually_Verify_a_certificate_against_an_OCSP.html
+# https://blog.ivanristic.com/2014/02/checking-ocsp-revocation-using-openssl.html
+# openssl ocsp -issuer issuer.crt -cert twitter.com.crt -text -url http://sr.symcd.com
 
