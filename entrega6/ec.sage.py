@@ -19,7 +19,6 @@ b = _sage_const_0x5ac635d8aa3a93e7b3ebbd55769886bc651d06b0cc53b0f63bce3c3e27d260
 Gx = _sage_const_0x6b17d1f2e12c4247f8bce6e563a440f277037d812deb33a0f4a13945d898c296 
 Gy = _sage_const_0x4fe342e2fe1a7f9b8ee7eb4a7c0f9e162bce33576b315ececbb6406837bf51f5 
 E = EllipticCurve(Zmod(p),[a,b])
-print E
 assert(E.cardinality()==n)
 
 # Check that cardinality of the curve is prime
@@ -111,18 +110,9 @@ crl_file.close()
 revoked_objects = crl_object.get_revoked()
 print 'CRL revoked certificates:', len(revoked_objects)
 
-
-# https://raymii.org/s/articles/OpenSSL_Manually_Verify_a_certificate_against_an_OCSP.html
-# https://blog.ivanristic.com/2014/02/checking-ocsp-revocation-using-openssl.html
-
 # curl http://sr.symcb.com/sr.crt > sr.crt
-f = open('sr.crt','w')
-subprocess.call(['curl','http://sr.symcb.com/sr.crt'],stdout=f)
 # openssl x509 -in sr.crt -inform der -out sr.pem
-subprocess.call(['openssl','x509','-in','sr.crt','-inform','der','-out','sr.pem'])
 # cat SymantecClass3EVSSLCA-G3.crt VeriSignClass3PublicPrimaryCertificationAuthority-G5.crt > chain.crt
-f = open('chain.crt','w')
-subprocess.call(['cat','SymantecClass3EVSSLCA-G3.crt','VeriSignClass3PublicPrimaryCertificationAuthority-G5.crt'],stdout=f)
 # openssl ocsp -issuer chain.crt -cert twitter.crt -url  http://sr.symcd.com -CAfile sr.pem
 try:
 	subprocess.check_output(['openssl','ocsp','-issuer','chain.crt','-cert','twitter.crt','-url','http://sr.symcd.com','-CAfile','sr.pem'])
