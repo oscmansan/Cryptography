@@ -22,8 +22,8 @@ print 'Prime order?', is_prime(E.cardinality())
 
 # Point P
 pubkey = '04957da92c1cc4c61d749de0ecb13b5dd40fd200e34c317081141907d2ec122f804e5a0f178770bc231a0c01ea275afa3b3a7c3524c036f30ee03124929dc21ac1'
-Px = Integer(pubkey[2:2+64],16)
-Py = Integer(pubkey[-64:],16)
+#Px = Integer(pubkey[2:2+64],16)
+#Py = Integer(pubkey[-64:],16)
 Px = 0x957da92c1cc4c61d749de0ecb13b5dd40fd200e34c317081141907d2ec122f80
 Py = 0x4e5a0f178770bc231a0c01ea275afa3b3a7c3524c036f30ee03124929dc21ac1
 P = E([Px,Py])
@@ -36,8 +36,8 @@ print 'Order of point P:', P.order()
 
 # Check certificate
 signature = '304502205ccb3b85bcb3c500899004c1c70a266d9f88c4f2410e5e6a842be5fb759ffdd4022100ee779d07baf61c547a966778a3e2689165a91b8f3272ca9082bf23229737d74c'
-f1 = Integer(signature[8:8+64],16)
-f2 = Integer(signature[-66:],16)
+#f1 = Integer(signature[8:8+64],16)
+#f2 = Integer(signature[-66:],16)
 f1 = 0x5ccb3b85bcb3c500899004c1c70a266d9f88c4f2410e5e6a842be5fb759ffdd4
 f2 = 0x00ee779d07baf61c547a966778a3e2689165a91b8f3272ca9082bf23229737d74c
 # m = ClientHello.random | ServerHello.random | ServerKeyExchange.curve_type | ServerKeyExchange.named_cuve | ServerKeyExchange.pubkey_length | ServerKeyExchange.pubkey
@@ -59,7 +59,7 @@ print 'Correct signature?', mod(v[0],q) == f1
 ## Exercise 2 #################################################################
 print '\n## Exercise 2 ###################################'
 
-# Website: twitter.com
+print 'Website: twitter.com'
 
 # Curve P-256 (from http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.186-4.pdf)
 print 'Curve P-256'
@@ -79,20 +79,22 @@ assert(mod(Py**2,p)==mod(Px**3+a*Px+b,p))
 G = E([Gx,Gy])
 dni = 77620769
 
+# privkey resulting from concatenating my dni 8 times, and the associated pubkey
 privkey = int(str(dni)*8)
 pubkey = privkey * G
 print 'pubkey:', pubkey
 
+# pubkey that has my dni as component x of the point
 x = dni
 z = mod(x**3+a*x+b,p)
-assert(mod(z**((p-1)/2),p)==1)
-y = mod(z**((p+1)/4),p)
+assert(mod(z**((p-1)/2),p)==1) # check that z is a square
+y = mod(z**((p+1)/4),p) # compute the square root of z, which is the y component of the point
 Q = E([x,y])
 assert(mod(y**2,p)==mod(x**3+a*x+b,p))
 print 'Q:', Q
 
 # We can't find the private key associated to the public key Q because 
-# it's the Discrete Logarithm Problem, which is conjetured intractable
+# it's the Discrete Logarithm Problem, which is conjetured intractable.
 # print discrete_log(Q, G, G.order(), operation='+') # takes forever
 
 
@@ -109,7 +111,7 @@ print 'CRL revoked certificates:', len(revoked_objects)
 # curl http://sr.symcb.com/sr.crt > sr.crt
 # openssl x509 -in sr.crt -inform der -out sr.pem
 # cat SymantecClass3EVSSLCA-G3.crt VeriSignClass3PublicPrimaryCertificationAuthority-G5.crt > chain.crt
-# openssl ocsp -issuer chain.crt -cert twitter.crt -url  http://sr.symcd.com -CAfile sr.pem
+# openssl ocsp -issuer chain.crt -cert twitter.crt -url http://sr.symcd.com -CAfile sr.pem
 try:
 	subprocess.check_output(['openssl','ocsp','-issuer','chain.crt','-cert','twitter.crt','-url','http://sr.symcd.com','-CAfile','sr.pem'])
 except subprocess.CalledProcessError as e:
