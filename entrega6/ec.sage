@@ -2,9 +2,10 @@
 import urllib2
 import OpenSSL
 import subprocess
+from build_hash import digest
 
 ## Exercise 1 #################################################################
-print '## Exercise 1 ###################################'
+print '## Exercise 1 #########################################'
 
 # Curve P-256 (from http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.186-4.pdf)
 print 'Curve P-256'
@@ -20,34 +21,27 @@ assert(E.cardinality()==n)
 # Check that cardinality of the curve is prime
 print 'Prime order?', is_prime(E.cardinality())
 
-# Point P
-pubkey = '04957da92c1cc4c61d749de0ecb13b5dd40fd200e34c317081141907d2ec122f804e5a0f178770bc231a0c01ea275afa3b3a7c3524c036f30ee03124929dc21ac1'
-#Px = Integer(pubkey[2:2+64],16)
-#Py = Integer(pubkey[-64:],16)
-Px = 0x957da92c1cc4c61d749de0ecb13b5dd40fd200e34c317081141907d2ec122f80
-Py = 0x4e5a0f178770bc231a0c01ea275afa3b3a7c3524c036f30ee03124929dc21ac1
+# Point P (subjectPublicKey)
+pubkey = '04e6ecdcce7e73e8344f1ae129f66de1d463c65fcda70e91e36a41f66430fb01ec98a2b9fe63ef07ec0950990e91f9ca5616db1c10e85184c7b062055209fcce1c'
+Px = Integer(pubkey[2:2+64],16)
+Py = Integer(pubkey[-64:],16)
 P = E([Px,Py])
 
 # Check if P belongs to E
-print 'Generator point P belongs to the curve?', mod(Py**2,p)==mod(Px**3+a*Px+b,p)
+print 'Generator point P belongs to the curve?', P in E
 
 # Order of P
 print 'Order of point P:', P.order()
 
-# Check certificate
-signature = '304502205ccb3b85bcb3c500899004c1c70a266d9f88c4f2410e5e6a842be5fb759ffdd4022100ee779d07baf61c547a966778a3e2689165a91b8f3272ca9082bf23229737d74c'
-#f1 = Integer(signature[8:8+64],16)
-#f2 = Integer(signature[-66:],16)
-f1 = 0x5ccb3b85bcb3c500899004c1c70a266d9f88c4f2410e5e6a842be5fb759ffdd4
-f2 = 0x00ee779d07baf61c547a966778a3e2689165a91b8f3272ca9082bf23229737d74c
-# m = ClientHello.random | ServerHello.random | ServerKeyExchange.curve_type | ServerKeyExchange.named_cuve | ServerKeyExchange.pubkey_length | ServerKeyExchange.pubkey
-# m = a1fe224ab613179d0c166381230fcfedd50d6f7128177bf24a762f10129ee80df8e88488a3b474aa36913455ed30be9ce3133def8e7bb57c64768ac74f48fa7d
-# h = sha512sum(m)[:256]
-h = 0xa1fe224ab613179d0c166381230fcfedd50d6f7128177bf24a762f10129ee80d
+# Check signature
+signature = '3046022100b3363e0acb7ef124de271e5d14c0270a0694d277815993e65997156eeb058d64022100f5261d8d5b02ea67af0ef5b7bd184c992a0a36738da3846a17188704cedbf323'
+f1 = Integer(signature[8:8+66],16)
+f2 = Integer(signature[-66:],16)
+h = digest()
 
 G = E([Gx,Gy])
 q = G.order()
-assert(q == n)
+assert(q==n)
 
 w = mod(f2**(-1),q)
 w1 = mod(h*w,q);
@@ -57,7 +51,7 @@ print 'Correct signature?', mod(v[0],q) == f1
 
 
 ## Exercise 2 #################################################################
-print '\n## Exercise 2 ###################################'
+print '\n## Exercise 2 #########################################'
 
 print 'Website: twitter.com'
 
@@ -71,10 +65,10 @@ Gy = 0x4fe342e2fe1a7f9b8ee7eb4a7c0f9e162bce33576b315ececbb6406837bf51f5
 E = EllipticCurve(Zmod(p),[a,b])
 
 pubkey = '04529368ee3a246ce3f7e0cf5c4df851aeccb47ee452fd2a37c71824da6469d528673065f07c82d79bacaf8dca27835c21ea8eae8c085a3ebc42af995524f132aa'
-Px = int(pubkey[2:66],16)
-Py = int(pubkey[66:],16)
+Px = int(pubkey[2:2+64],16)
+Py = int(pubkey[-64:],16)
 P = E([Px,Py])
-assert(mod(Py**2,p)==mod(Px**3+a*Px+b,p))
+assert(P in E)
 
 G = E([Gx,Gy])
 dni = 77620769
@@ -90,16 +84,20 @@ z = mod(x**3+a*x+b,p)
 assert(mod(z**((p-1)/2),p)==1) # check that z is a square
 y = mod(z**((p+1)/4),p) # compute the square root of z, which is the y component of the point
 Q = E([x,y])
-assert(mod(y**2,p)==mod(x**3+a*x+b,p))
+assert(Q in E)
 print 'Q:', Q
 
-# We can't find the private key associated to the public key Q because 
-# it's the Discrete Logarithm Problem, which is conjetured intractable.
+# We can't find the privkey associated to the pubkey Q because it's the Discrete
+# Logarithm Problem, which is conjetured intractable.
 # print discrete_log(Q, G, G.order(), operation='+') # takes forever
+
+# Even trying to generate the pubkey from a known privkey, I haven't been able
+# to find a pubkey that starts with my dni in a reasonable time.
+# for r in range(G.order()): if str(r*G).startswith(str(dni)): print r*G; break # takes forever
 
 
 ## Exercise 3 #################################################################
-print '\n## Exercise 3 ###################################'
+print '\n## Exercise 3 #########################################'
 
 CRL_URI = 'http://sr.symcb.com/sr.crl'
 crl_file = urllib2.urlopen(CRL_URI)
